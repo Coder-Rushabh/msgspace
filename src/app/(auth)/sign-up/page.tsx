@@ -76,23 +76,21 @@ export default function SignUpForm() {
       });
 
       router.replace(`/verify/${username}`);
-
-      setIsSubmitting(false);
     } catch (error) {
       console.error('Error during sign-up:', error);
 
       const axiosError = error as AxiosError<ApiResponse>;
 
       // Default error message
-      let errorMessage = axiosError.response?.data.message;
-      ('There was a problem with your sign-up. Please try again.');
+      let errorMessage = axiosError.response?.data.message ?? 
+        'There was a problem with your sign-up. Please try again.';
 
       toast({
         title: 'Sign Up Failed',
         description: errorMessage,
         variant: 'destructive',
       });
-
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -113,6 +111,8 @@ export default function SignUpForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
+                  
+
                   <FormLabel>Username</FormLabel>
                   <Input
                     {...field}

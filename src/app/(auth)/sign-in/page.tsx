@@ -20,7 +20,9 @@ import { signInSchema } from '@/schemas/signInSchema';
 
 export default function SignInForm() {
   const router = useRouter();
+  const { toast } = useToast();
 
+  // Initialize the form with zod resolver and default values
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -29,7 +31,7 @@ export default function SignInForm() {
     },
   });
 
-  const { toast } = useToast();
+  // Handle form submission
   const onSubmit = async (data: z.infer<typeof signInSchema>) => {
     const result = await signIn('credentials', {
       redirect: false,
@@ -38,22 +40,12 @@ export default function SignInForm() {
     });
 
     if (result?.error) {
-      if (result.error === 'CredentialsSignin') {
-        toast({
-          title: 'Login Failed',
-          description: 'Incorrect username or password',
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: result.error,
-          variant: 'destructive',
-        });
-      }
-    }
-
-    if (result?.url) {
+      toast({
+        title: result.error === 'CredentialsSignin' ? 'Login Failed' : 'Error',
+        description: result.error === 'CredentialsSignin' ? 'Incorrect username or password' : result.error,
+        variant: 'destructive',
+      });
+    } else if (result?.url) {
       router.replace('/dashboard');
     }
   };
